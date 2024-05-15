@@ -1,9 +1,11 @@
 pipeline {
     agent any
     stages {
-           stage('Inicial'){
+           stage('Build Image'){
                 steps {
-                    echo 'Iniciando pipeline'
+                    script {
+                        dockerapp = docker.build("gianmilani/jenkinstest", '-f ./src/Dockerfile ./src')
+                    }
                 }
            }
     }
