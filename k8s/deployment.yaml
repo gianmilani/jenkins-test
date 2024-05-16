@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-api
+  labels:
+    app: spring-api
+spec:
+  selector:
+    matchLabels:
+      app: spring-api-container
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: spring-api-container
+    spec:
+      containers:
+        - name: spring-api-container
+          image: "gianmilani/jenkinstest"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 50Mi
+            limits:
+              cpu: 256m
+              memory: 100Mi
+          startupProbe:
+            httpGet:
+              path: /health-prob
+              port: 8080
+            periodSeconds: 3
+            failureThreshold: 30
+          livenessProbe:
+            httpGet:
+              path: /health-prob
+              port: 8080
+            periodSeconds: 5
+            failureThreshold: 3
+            timeoutSeconds: 1
+            successThreshold: 1
+            initialDelaySeconds: 50
+          readinessProbe:
+            httpGet:
+              path: /health-prob
+              port: 8080
+            periodSeconds: 3
+            failureThreshold: 1
+            initialDelaySeconds: 20
+        
+      volumes:
+        - name: config
+          configMap:
+            name: configmap-server-info
+            items:
+            - key: info
+              path: ".env"  
